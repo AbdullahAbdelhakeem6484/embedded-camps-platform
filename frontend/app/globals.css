@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EmbeddedCamps Design System
+   Palette inspired by SIGNA One — dominant violet/magenta on deep dark.
+   Light mode: soft lavender whites with violet accents.
+   Dark mode:  near-black #07050E with violet + magenta glows.
+═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Surfaces ─── */
+  --background:    #F5F3FF;       /* Softest GE lavender-white */
+  --foreground:    #2E1065;       /* Deep violet text (no black) */
+  --surface:       #FFFFFF;       /* Clean white cards */
+  --surface-hover: #EDE9FE;       /* Lavender hover */
+  --border:        rgba(124, 58, 237, 0.15); /* Soft violet borders */
+
+  /* ─── Text ─── */
+  --text-muted:    #7C3AED;       /* Vibrant violet */
+
+  /* ─── Brand — primary = violet, accent = magenta ─── */
+  --brand-primary:    #7C3AED;    /* Vibrant GE violet */
+  --brand-primary-h:  #6D28D9;
+  --brand-primary-l:  #8B5CF6;
+  --brand-accent:     #D946EF;
+  --brand-accent-h:   #C026D3;
+  --brand-glow:       #8B5CF6;
+
+  /* ─── Legacy aliases (kept for backward compat) ─── */
+  --brand-blue:    #7C3AED;
+  --brand-indigo:  #6D28D9;
+  --brand-green:   #059669;
+
+  /* ─── Hero gradient (light) ─── */
+  --hero-g1: #F5F3FF;
+  --hero-g2: #E0E7FF;
+  --hero-g3: #FAE8FF;
+  --hero-g4: #EDE9FE;
+}
+
+.dark {
+  /* ─── Surfaces ─── */
+  --background:    #1F1735;       /* Rich, premium royal deep violet (avoid pitch black) */
+  --foreground:    #F5F3FF;       /* Bright, clear lavender-white text */
+  --surface:       #2F254B;       /* Premium slate purple container (avoid black) */
+  --surface-hover: #3E3263;       /* Indigo hover accent */
+  --border:        rgba(167, 139, 250, 0.25); /* Bright lavender borders */
+
+  /* ─── Text ─── */
+  --text-muted:    #C084FC;       /* Light purple */
+
+  /* ─── Brand — more saturated for dark bg ─── */
+  --brand-primary:    #8B5CF6;    /* Bright lavender-violet */
+  --brand-primary-h:  #7C3AED;
+  --brand-primary-l:  #A78BFA;
+  --brand-accent:     #F472B6;
+  --brand-accent-h:   #EC4899;
+  --brand-glow:       #C084FC;
+
+  /* ─── Legacy aliases ─── */
+  --brand-blue:    #8B5CF6;
+  --brand-indigo:  #7C3AED;
+  --brand-green:   #10b981;
+
+  /* ─── Hero gradient (dark) ─── */
+  --hero-g1: #1F1735;
+  --hero-g2: #2E1A47;
+  --hero-g3: #3D225A;
+  --hero-g4: #150E28;
+}
+
+@theme inline {
+  --color-background:    var(--background);
+  --color-foreground:    var(--foreground);
+  --color-surface:       var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border:        var(--border);
+  --color-text-muted:    var(--text-muted);
+  --color-brand:         var(--brand-primary);
+  --color-brand-accent:  var(--brand-accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ─── Hero Gradient Animation ─── */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+.hero-gradient {
+  background: linear-gradient(-45deg, var(--hero-g1), var(--hero-g2), var(--hero-g3), var(--hero-g4)) !important;
+  background-size: 400% 400%;
+  animation: gradient-shift 12s ease infinite;
+}
+
+/* ─── Glow Effects ─── */
+.glow-blue,
+.glow-violet {
+  box-shadow: 0 0 60px rgba(147, 51, 234, 0.30), 0 0 120px rgba(147, 51, 234, 0.10);
+}
+
+.glow-accent,
+.glow-magenta {
+  box-shadow: 0 0 60px rgba(232, 121, 249, 0.30), 0 0 120px rgba(232, 121, 249, 0.10);
+}
+
+.glow-green {
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+}
+
+/* ─── Brand gradient utility ─── */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--brand-primary-l), var(--brand-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Fade In Animation ─── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out forwards;
+  opacity: 0;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* ─── Pulse Dot ─── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ─── Shimmer (loading skeleton) ─── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {  background: linear-gradient(90deg,
+    var(--surface) 25%,
+    color-mix(in srgb, var(--surface) 60%, var(--brand-primary) 40%) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.25); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.45); }
+
+/* ─── Selection ─── */
+::selection { background: rgba(147, 51, 234, 0.30); color: inherit; }
+
+/* ─── Focus ring ─── */
+:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; border-radius: 4px; }
+
+/* ─── WhatsApp Button Styles ─── */
+.whatsapp-btn {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.3) !important;
+}
+.whatsapp-btn:hover {
+  background-color: #047857 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(4, 120, 87, 0.4) !important;
+}

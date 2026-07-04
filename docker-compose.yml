@@ -1,0 +1,80 @@
+version: '3.8'
+
+# ════════════════════════════════════════════════════════════════
+#  EmbeddedCamps — Docker Compose
+#  For local development and VPS deployment.
+#  For Vercel + Railway deployment, use railway.json instead.
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # ─── PostgreSQL ───────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-embeddedcamp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}      # Required — no default in production
+      POSTGRES_DB: ${DB_NAME:-embeddedcamp}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-embeddedcamp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Expose only on localhost for security (not publicly)
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  # ─── Backend API ──────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-embeddedcamp}:${DB_PASSWORD}@db:5432/${DB_NAME:-embeddedcamp}
+    # No local uploads volume — files go to Bunny.net
+    ports:
+      - "127.0.0.1:5000:5000"  # Nginx reverse proxy handles public exposure
+
+  # ─── Frontend (Next.js) ───────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:5000/api}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # ─── Nginx Reverse Proxy ──────────────────────────────────────
+  # Handles SSL termination, routing, and rate limiting at the network edge.
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro       # Mount your SSL certificates here
+    profiles:
+      - production  # Only starts with: docker compose --profile production up
+
+volumes:
+  pgdata:
+    driver: local

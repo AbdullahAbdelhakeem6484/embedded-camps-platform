@@ -1,0 +1,14 @@
+{
+    "name": "embedded-camps-platform",
+    "version": "1.0.0",
+    "scripts": {
+        "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "db:setup": "cd backend && npx prisma generate && npx prisma db push && npx prisma db seed"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
