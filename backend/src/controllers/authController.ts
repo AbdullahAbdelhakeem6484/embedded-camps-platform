@@ -99,7 +99,7 @@ export const login = async (req: Request, res: Response) => {
         await prisma.user.update({ where: { id: user.id }, data: { loginAttempts: 0, lockedUntil: null } });
     }
 
-    const payload = { id: user.id, email: user.email, role: user.role };
+    const payload = { id: user.id, email: user.email, name: user.name, role: user.role };
     const accessToken = signAccess(payload);
     const refreshToken = signRefresh({ id: user.id });
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -131,7 +131,7 @@ export const refreshToken = async (req: Request, res: Response) => {
         prisma.refreshToken.delete({ where: { token } }),
         prisma.refreshToken.create({ data: { token: newRefresh, userId: user.id, expiresAt } }),
     ]);
-    const accessToken = signAccess({ id: user.id, email: user.email, role: user.role });
+    const accessToken = signAccess({ id: user.id, email: user.email, name: user.name, role: user.role });
     res.cookie('refreshToken', newRefresh, COOKIE_OPTS);
     res.json({ accessToken });
 };

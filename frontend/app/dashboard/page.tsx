@@ -7,7 +7,7 @@ import {
     Play, CheckCircle2, Zap, BarChart2, Calendar, Megaphone, Pin,
 } from 'lucide-react';
 import Link from 'next/link';
-import { getStoredUser } from '@/lib/auth';
+import { getCachedUser } from '@/lib/auth';
 import { StatCardSkeleton, DashboardCampSkeleton } from '@/components/ui/Skeleton';
 
 interface CampSummary {
@@ -84,7 +84,7 @@ export default function EngineerDashboard() {
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
-    const user = getStoredUser();
+    const user = getCachedUser();
 
     const fetchData = useCallback(async () => {
         if (!user) return;

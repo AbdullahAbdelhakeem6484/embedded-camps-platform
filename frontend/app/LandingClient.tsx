@@ -18,7 +18,9 @@ interface BrandDef {
     name: string;
     icon: string;
     tagline: string;
+    desc?: string;
     topics: string[];
+    courses?: { title: string }[];
     stats?: Record<string, string>;
     price?: string;
     origPrice?: string;
@@ -39,10 +41,10 @@ const BRANDS: BrandDef[] = [
         tagline: 'AOSP & Android Automotive (AAOS) Bootcamp',
         topics: ['AOSP & AAOS Internals', 'Android Automotive (AAOS)', 'HAL Development', 'Binder IPC', 'Android Boot Flow', 'SELinux Policy', 'A/B OTA Updates', 'Career Coaching'],
         stats: { Courses: '9', Hours: '55+', Labs: '35+', Hardware: 'RPi4' },
-        price: '$100',
-        origPrice: '$200',
-        priceEGP: '5,500 EGP',
-        origEGP: '10,500 EGP',
+        price: '$110',
+        origPrice: '$220',
+        priceEGP: '6,000 EGP',
+        origEGP: '12,000 EGP',
         status: 'live',
         href: '/camps/aosp',
         enrollMsg: 'Hi! I want to enroll in AOSPCamp (AOSP & Android Automotive). Please send me the payment details.',
@@ -62,7 +64,19 @@ const BRANDS: BrandDef[] = [
         name: 'AICamp',
         icon: '🤖',
         tagline: 'AI, LLMs & AI Agents Bootcamp',
-        topics: ['AI, LLMs & AI Agents', 'Machine Learning', 'Deep Learning', 'Generative AI', 'NLP', 'Computer Vision', 'Agentic Workflows', 'Recommendation Systems'],
+        desc: 'Build production AI systems — LLMs, RAG pipelines, AI agents, and deployed ML models. Not just notebooks.',
+        topics: ['Python for AI & ML', 'Deep Learning & Neural Networks', 'LLMs & Transformers', 'LangChain, RAG & Vector DBs', 'AI Agents & Orchestration', 'Generative AI (Text & Image)', 'MLOps & Model Deployment', 'AI System Design'],
+        courses: [
+            { title: 'Python & ML Foundations' },
+            { title: 'Deep Learning & Neural Networks' },
+            { title: 'LLMs, Transformers & Fine-Tuning' },
+            { title: 'LangChain, RAG & Vector Databases' },
+            { title: 'AI Agents & Agentic Workflows' },
+            { title: 'Generative AI & Computer Vision' },
+            { title: 'MLOps, APIs & Model Deployment' },
+            { title: 'AI System Design & Career Coaching' },
+        ],
+        stats: { Courses: '8', Hours: '60+', Labs: '25+', Projects: '10' },
         status: 'coming-soon',
         color: { border: 'border-sky-500/20', bg: 'bg-sky-500/5', text: 'text-sky-400' },
         notifyMsg: 'Hi! I\'m interested in AICamp (AI, LLMs & AI Agents). Please notify me when it launches.',
@@ -71,8 +85,18 @@ const BRANDS: BrandDef[] = [
         id: 'en',
         name: 'EnglishFluencyCamp',
         icon: '🌍',
-        tagline: 'English Fluency & Business Communication',
-        topics: ['English Fluency', 'Technical Communication', 'Business Writing', 'Presentation Skills', 'Interview Prep', 'Meeting Leadership', 'Technical Documentation', 'Professional Networking'],
+        tagline: 'English Fluency & Business Communication for Engineers',
+        desc: 'Speak and write English with confidence at work. Every lesson uses real engineering contexts — no generic grammar drills.',
+        topics: ['Technical Writing & Docs', 'Email & Slack Communication', 'Engineering Presentations', 'Code Review Language', 'Technical Interviews in English', 'Meeting Leadership', 'LinkedIn & Resume Writing', 'Business Negotiation'],
+        courses: [
+            { title: 'Technical English Foundations' },
+            { title: 'Email, Slack & Async Writing' },
+            { title: 'Engineering Presentations & Demos' },
+            { title: 'Technical Interviews in English' },
+            { title: 'Meeting Leadership & Discussion' },
+            { title: 'Resume, LinkedIn & Career Docs' },
+        ],
+        stats: { Courses: '6', Hours: '40+', Projects: '20+', Level: 'All' },
         status: 'coming-soon',
         color: { border: 'border-emerald-500/20', bg: 'bg-emerald-500/5', text: 'text-emerald-400' },
         notifyMsg: 'Hi! I\'m interested in EnglishFluencyCamp (English Fluency for Engineers). Please notify me when it launches.',
@@ -336,14 +360,44 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
                                     <h3 className="text-lg font-bold text-foreground">{brand.name}</h3>
                                     <p className={`text-xs ${textColor} mt-0.5`}>{brand.tagline}</p>
                                 </div>
-                                <div className="flex flex-wrap gap-1.5 mb-5">
-                                    {brand.topics.slice(0, 5).map(t => (
-                                        <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">{t}</span>
-                                    ))}
-                                    {brand.topics.length > 5 && (
-                                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">+{brand.topics.length - 5} more</span>
-                                    )}
-                                </div>
+                                {brand.desc && (
+                                    <p className="text-xs text-gray-400 leading-relaxed mb-4">{brand.desc}</p>
+                                )}
+                                {brand.stats && (
+                                    <div className="grid grid-cols-4 gap-2 mb-4">
+                                        {Object.entries(brand.stats).map(([k, v]) => (
+                                            <div key={k} className="bg-surface-hover/30 rounded-lg p-2 text-center border border-border">
+                                                <div className="text-sm font-bold text-foreground">{v}</div>
+                                                <div className="text-[9px] text-text-muted uppercase tracking-wider mt-0.5">{k}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {brand.courses && brand.courses.length > 0 ? (
+                                    <div className="mb-4">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Curriculum Preview</p>
+                                        <div className="space-y-1">
+                                            {brand.courses.slice(0, 4).map((c, i) => (
+                                                <div key={i} className="flex items-center gap-2 text-xs text-gray-400">
+                                                    <CheckCircle2 className="w-3 h-3 text-violet-400 shrink-0" />
+                                                    {c.title}
+                                                </div>
+                                            ))}
+                                            {brand.courses.length > 4 && (
+                                                <p className="text-[10px] text-gray-600 pl-5">+{brand.courses.length - 4} more courses</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-wrap gap-1.5 mb-5">
+                                        {brand.topics.slice(0, 5).map(t => (
+                                            <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">{t}</span>
+                                        ))}
+                                        {brand.topics.length > 5 && (
+                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">+{brand.topics.length - 5} more</span>
+                                        )}
+                                    </div>
+                                )}
                                 <div className="mb-4">
                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/20">
                                         50% OFF at launch

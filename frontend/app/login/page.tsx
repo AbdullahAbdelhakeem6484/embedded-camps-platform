@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { setToken, getStoredUser } from '@/lib/auth';
+import { setToken, setStoredUser, getStoredUser } from '@/lib/auth';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
@@ -26,6 +26,7 @@ export default function LoginPage() {
         try {
             const res = await api.post('/auth/login', form);
             setToken(res.data.accessToken);
+            if (res.data.user) setStoredUser(res.data.user);
             const role = res.data.user?.role;
             router.push(role === 'ADMIN' ? '/admin' : '/dashboard');
         } catch (err: any) {
