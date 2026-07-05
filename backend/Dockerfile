@@ -20,6 +20,9 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# OpenSSL required by Prisma engine on Alpine
+RUN apk add --no-cache openssl
+
 # Only production deps in final image
 COPY package*.json ./
 RUN npm ci --only=production
