@@ -931,6 +931,11 @@ export default function MasterSessionDetailsPage({ params }: { params: any }) {
         </div>
     );
 
+    if (!session) return (
+        <div className="flex items-center justify-center min-h-screen text-gray-400">
+            Session not found.
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white p-6">
