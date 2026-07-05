@@ -1,15 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-
-  // Proxy all /api/* calls to the Railway backend.
-  // This keeps auth cookies on the same domain (Vercel) avoiding cross-domain SameSite issues.
+  // Proxy all /api/* calls to the backend.
+  // This keeps auth cookies same-domain (Vercel) avoiding cross-domain SameSite issues.
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/:path*`,
       },
     ];
   },
