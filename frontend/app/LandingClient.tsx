@@ -53,9 +53,22 @@ const BRANDS: BrandDef[] = [
         id: 'pcode',
         name: 'PCodeCamp',
         icon: '🧩',
-        tagline: 'Coding Problem Solving & System Design',
-        topics: ['Algorithms & DSA', 'Coding Problem Solving', 'LeetCode Patterns', 'System Design', 'FAANG Prep', 'Competitive Programming'],
+        tagline: 'DSA, Problem Solving & System Design Bootcamp',
+        desc: 'Master data structures, algorithm patterns, and system design through 150+ real interview problems. Built for engineers targeting FAANG, MAANG, and top-tier companies.',
+        topics: ['Data Structures & Algorithms', 'LeetCode Mastery', 'Dynamic Programming', 'System Design (HLD + LLD)', 'FAANG Interview Prep', 'Mock Interviews'],
+        courses: [
+            { title: 'Programming Foundations & Complexity Analysis' },
+            { title: 'Data Structures (Arrays, Trees, Graphs, Heaps)' },
+            { title: 'Algorithm Patterns (Sliding Window, Two Pointers, BFS/DFS)' },
+            { title: 'Dynamic Programming & Backtracking' },
+            { title: 'LeetCode Mastery — 150+ Problems by Pattern' },
+            { title: 'System Design Fundamentals (Scalability, Caching, DBs)' },
+            { title: 'Embedded & Mobile System Design' },
+            { title: 'Mock Interviews & Career Coaching' },
+        ],
+        stats: { Courses: '8', Hours: '50+', Problems: '150+', Mocks: '10+' },
         status: 'coming-soon',
+        href: '/camps/pcode',
         color: { border: 'border-amber-500/20', bg: 'bg-amber-500/5', text: 'text-amber-400' },
         notifyMsg: 'Hi! I\'m interested in PCodeCamp (Coding Problem Solving & System Design). Please notify me when it launches.',
     },
@@ -78,6 +91,7 @@ const BRANDS: BrandDef[] = [
         ],
         stats: { Courses: '8', Hours: '60+', Labs: '25+', Projects: '10' },
         status: 'coming-soon',
+        href: '/camps/ai',
         color: { border: 'border-sky-500/20', bg: 'bg-sky-500/5', text: 'text-sky-400' },
         notifyMsg: 'Hi! I\'m interested in AICamp (AI, LLMs & AI Agents). Please notify me when it launches.',
     },
@@ -98,10 +112,47 @@ const BRANDS: BrandDef[] = [
         ],
         stats: { Courses: '6', Hours: '40+', Projects: '20+', Level: 'All' },
         status: 'coming-soon',
+        href: '/camps/en',
         color: { border: 'border-emerald-500/20', bg: 'bg-emerald-500/5', text: 'text-emerald-400' },
         notifyMsg: 'Hi! I\'m interested in EnglishFluencyCamp (English Fluency for Engineers). Please notify me when it launches.',
     },
 ];
+
+const THEMES: Record<string, {
+    border: string; glow: string; accent: string;
+    tagStyle: string; btn: string; btnOutline: string; iconBg: string; numColor: string;
+}> = {
+    pcode: {
+        border: 'border-amber-500/30',
+        glow: '0 0 80px rgba(245,158,11,0.08)',
+        accent: 'text-amber-400',
+        tagStyle: 'bg-amber-500/10 border-amber-500/20 text-amber-300',
+        btn: 'bg-amber-600 hover:bg-amber-500 text-white',
+        btnOutline: 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20',
+        iconBg: 'bg-amber-500/20',
+        numColor: '#f59e0b',
+    },
+    ai: {
+        border: 'border-sky-500/30',
+        glow: '0 0 80px rgba(14,165,233,0.08)',
+        accent: 'text-sky-400',
+        tagStyle: 'bg-sky-500/10 border-sky-500/20 text-sky-300',
+        btn: 'bg-sky-600 hover:bg-sky-500 text-white',
+        btnOutline: 'bg-sky-500/10 border-sky-500/30 text-sky-300 hover:bg-sky-500/20',
+        iconBg: 'bg-sky-500/20',
+        numColor: '#0ea5e9',
+    },
+    en: {
+        border: 'border-emerald-500/30',
+        glow: '0 0 80px rgba(16,185,129,0.08)',
+        accent: 'text-emerald-400',
+        tagStyle: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+        btn: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+        btnOutline: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20',
+        iconBg: 'bg-emerald-500/20',
+        numColor: '#10b981',
+    },
+};
 
 const ICON_MAP: Record<string, React.ElementType> = {
     '00': Terminal, '01': Terminal, '02': Cpu, '03': Bug, '04': Shield,
@@ -342,78 +393,110 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
                             ))}
                         </div>
                     )}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="space-y-8">
                         {comingSoon.map((brand) => {
                         const isLiveInDb = activatedSlugs.has(brand.id);
                         const dbCamp = dbCamps.find(c => c.slug === brand.id);
-                        const textColor = brand.color?.text ?? 'text-violet-400';
+                        const theme = THEMES[brand.id] ?? THEMES.ai;
                         return (
-                            <div key={brand.id} className={`relative rounded-2xl border ${isLiveInDb ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border bg-surface'} p-6 overflow-hidden`}>
-                                <div className="absolute top-4 right-4">
+                            <div key={brand.id}
+                                className={`relative rounded-3xl border ${theme.border} bg-surface/50 p-6 sm:p-8 overflow-hidden`}
+                                style={{ boxShadow: theme.glow }}>
+
+                                {/* Badges */}
+                                <div className="relative lg:absolute lg:top-6 lg:right-6 flex flex-row lg:flex-col items-center lg:items-end gap-2 mb-6 lg:mb-0 z-10 flex-wrap">
+                                    <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/20">50% OFF at launch</span>
                                     {isLiveInDb
-                                        ? <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">● LIVE</span>
-                                        : <span className="px-2.5 py-0.5 rounded-full bg-surface-hover border border-border text-text-muted text-[10px] font-bold uppercase tracking-wider">Coming Soon</span>
+                                        ? <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/20">● ENROLLING NOW</span>
+                                        : <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/20">● COMING SOON</span>
                                     }
                                 </div>
-                                <div className="mb-4">
-                                    <span className="text-3xl mb-3 block">{brand.icon}</span>
-                                    <h3 className="text-lg font-bold text-foreground">{brand.name}</h3>
-                                    <p className={`text-xs ${textColor} mt-0.5`}>{brand.tagline}</p>
-                                </div>
-                                {brand.desc && (
-                                    <p className="text-xs text-gray-400 leading-relaxed mb-4">{brand.desc}</p>
-                                )}
-                                {brand.stats && (
-                                    <div className="grid grid-cols-4 gap-2 mb-4">
-                                        {Object.entries(brand.stats).map(([k, v]) => (
-                                            <div key={k} className="bg-surface-hover/30 rounded-lg p-2 text-center border border-border">
-                                                <div className="text-sm font-bold text-foreground">{v}</div>
-                                                <div className="text-[9px] text-text-muted uppercase tracking-wider mt-0.5">{k}</div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                                    {/* ── Left: details ── */}
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-5">
+                                            <span className="text-4xl sm:text-5xl">{brand.icon}</span>
+                                            <div>
+                                                <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{brand.name}</h3>
+                                                <p className={`text-sm ${theme.accent} mt-0.5`}>{brand.tagline}</p>
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
-                                {brand.courses && brand.courses.length > 0 ? (
-                                    <div className="mb-4">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Curriculum Preview</p>
-                                        <div className="space-y-1">
-                                            {brand.courses.slice(0, 4).map((c, i) => (
-                                                <div key={i} className="flex items-center gap-2 text-xs text-gray-400">
-                                                    <CheckCircle2 className="w-3 h-3 text-violet-400 shrink-0" />
-                                                    {c.title}
-                                                </div>
+                                        </div>
+
+                                        {/* Stats */}
+                                        {brand.stats && (
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                                                {Object.entries(brand.stats).map(([k, v]) => (
+                                                    <div key={k} className="bg-surface-hover/30 rounded-xl p-3 text-center border border-border">
+                                                        <div className="text-xl font-bold text-foreground">{v}</div>
+                                                        <div className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">{k}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Topic Tags */}
+                                        <div className="flex flex-wrap gap-2 mb-5">
+                                            {brand.topics.map(t => (
+                                                <span key={t} className={`text-xs px-2.5 py-1 rounded-lg font-medium border ${theme.tagStyle}`}>{t}</span>
                                             ))}
-                                            {brand.courses.length > 4 && (
-                                                <p className="text-[10px] text-gray-600 pl-5">+{brand.courses.length - 4} more courses</p>
+                                        </div>
+
+                                        {/* Description */}
+                                        {brand.desc && (
+                                            <p className="text-sm text-gray-400 leading-relaxed mb-6">{brand.desc}</p>
+                                        )}
+
+                                        {/* CTAs */}
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            {isLiveInDb && dbCamp ? (
+                                                <Link href={`/camps/${dbCamp.slug}`}
+                                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold transition-all text-sm">
+                                                    <ArrowRight className="w-4 h-4" />View Camp
+                                                </Link>
+                                            ) : (
+                                                <a href={`https://wa.me/${WA}?text=${encodeURIComponent(brand.notifyMsg ?? '')}`}
+                                                    target="_blank" rel="noopener noreferrer"
+                                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all text-sm ${theme.btn}`}>
+                                                    <MessageCircle className="w-4 h-4" />Notify Me on WhatsApp
+                                                </a>
+                                            )}
+                                            {brand.href && (
+                                                <Link href={brand.href}
+                                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all text-sm border ${theme.btnOutline}`}>
+                                                    View Full Curriculum<ArrowRight className="w-4 h-4" />
+                                                </Link>
                                             )}
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="flex flex-wrap gap-1.5 mb-5">
-                                        {brand.topics.slice(0, 5).map(t => (
-                                            <span key={t} className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">{t}</span>
-                                        ))}
-                                        {brand.topics.length > 5 && (
-                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-hover border border-border text-text-muted">+{brand.topics.length - 5} more</span>
-                                        )}
-                                    </div>
-                                )}
-                                <div className="mb-4">
-                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/20">
-                                        50% OFF at launch
-                                    </span>
+
+                                    {/* ── Right: course list ── */}
+                                    {brand.courses && brand.courses.length > 0 && (
+                                        <div>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">
+                                                Complete {brand.courses.length}-Course Curriculum
+                                            </p>
+                                            <div className="space-y-2">
+                                                {brand.courses.map((c, i) => (
+                                                    <div key={i} className="flex items-center gap-3 p-3 bg-surface-hover/30 rounded-xl border border-border hover:border-white/10 transition-all">
+                                                        <div className={`w-8 h-8 rounded-lg ${theme.iconBg} flex items-center justify-center shrink-0`}>
+                                                            <span className="text-[11px] font-mono font-bold" style={{ color: theme.numColor }}>
+                                                                {String(i).padStart(2, '0')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-sm font-medium text-foreground">{c.title}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {brand.href && (
+                                                <Link href={brand.href}
+                                                    className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold ${theme.accent} hover:opacity-80 transition-opacity`}>
+                                                    See full curriculum, modules & labs →
+                                                </Link>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                {isLiveInDb && dbCamp ? (
-                                    <Link href={`/camps/${dbCamp.slug}`}
-                                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl text-sm font-medium text-emerald-300 transition-all">
-                                        <ArrowRight className="w-3.5 h-3.5" />View Camp
-                                    </Link>
-                                ) : (
-                                    <a href={`https://wa.me/${WA}?text=${encodeURIComponent(brand.notifyMsg ?? '')}`} target="_blank" rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-surface-hover/80 hover:bg-surface-hover border border-border rounded-xl text-sm font-medium text-foreground transition-all">
-                                        <MessageCircle className="w-3.5 h-3.5" />Notify Me on WhatsApp
-                                    </a>
-                                )}
                             </div>
                         );
                         })}
