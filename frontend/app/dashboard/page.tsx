@@ -94,9 +94,9 @@ export default function EngineerDashboard() {
                 api.get('/certificates/my-certificates'),
                 api.get('/announcements?limit=5'),
             ]);
-            setSummary(summaryRes.data);
-            setCertificates(certRes.data);
-            setAnnouncements(annRes.data);
+            setSummary(Array.isArray(summaryRes.data) ? summaryRes.data : (summaryRes.data?.camps ?? []));
+            setCertificates(Array.isArray(certRes.data) ? certRes.data : (certRes.data?.data ?? []));
+            setAnnouncements(Array.isArray(annRes.data) ? annRes.data : (annRes.data?.data ?? []));
         } catch (err) {
             console.error(err);
         } finally {

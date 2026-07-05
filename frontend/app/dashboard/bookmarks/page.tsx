@@ -46,7 +46,7 @@ export default function BookmarksPage() {
     const fetchBookmarks = async () => {
         try {
             const res = await api.get('/bookmarks');
-            setBookmarks(res.data);
+            setBookmarks(Array.isArray(res.data) ? res.data : (res.data?.data ?? []));
         } catch {
             toast.error('Failed to load bookmarks');
         } finally {

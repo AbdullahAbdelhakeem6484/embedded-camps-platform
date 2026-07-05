@@ -33,7 +33,7 @@ export default function QuizHistoryPage() {
 
     useEffect(() => {
         api.get('/quizzes/my-attempts')
-            .then(res => setAttempts(res.data))
+            .then(res => setAttempts(Array.isArray(res.data) ? res.data : (res.data?.data ?? [])))
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
