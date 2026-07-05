@@ -30,8 +30,9 @@ app.use(
 app.use(
     cors({
         origin: (origin, callback) => {
-            if (!origin && NODE_ENV === 'development') return callback(null, true);
-            if (origin && ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+            // No origin = direct browser nav, curl, health checks — always allow
+            if (!origin) return callback(null, true);
+            if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
             callback(new Error(`CORS: Origin ${origin} not allowed`));
         },
         credentials: true,
