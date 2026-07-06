@@ -1094,10 +1094,10 @@ export default function InfotainmentShowcase() {
       `}} />
 
       {/* Segmented Cockpit Switcher Tab Control */}
-      <div className="flex flex-wrap justify-center gap-1.5 mb-8 max-w-4xl mx-auto bg-zinc-900/50 p-1.5 rounded-2xl border border-white/5 backdrop-blur-md">
+      <div className="flex overflow-x-auto gap-1.5 mb-8 max-w-4xl mx-auto bg-zinc-900/50 p-1.5 rounded-2xl border border-white/5 backdrop-blur-md scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
         <button
           onClick={() => setCurrentSystem('ivi')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'ivi'
               ? 'bg-blue-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1108,7 +1108,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('voice')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'voice'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1119,7 +1119,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('adas')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'adas'
               ? 'bg-emerald-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1130,7 +1130,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('ev')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'ev'
               ? 'bg-amber-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1141,7 +1141,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('diag')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'diag'
               ? 'bg-rose-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1152,7 +1152,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('cabin')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'cabin'
               ? 'bg-cyan-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1163,7 +1163,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('bike')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'bike'
               ? 'bg-teal-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
@@ -1174,7 +1174,7 @@ export default function InfotainmentShowcase() {
         </button>
         <button
           onClick={() => setCurrentSystem('led')}
-          className={`flex-1 min-w-[100px] sm:min-w-[120px] flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 min-w-[90px] flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
             currentSystem === 'led'
               ? 'bg-fuchsia-600 text-white shadow-md'
               : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'

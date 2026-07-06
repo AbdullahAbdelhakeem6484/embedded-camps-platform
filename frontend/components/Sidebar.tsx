@@ -31,9 +31,11 @@ function cn(...inputs: ClassValue[]) {
 
 interface SidebarProps {
     isAdmin?: boolean;
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
-export default function Sidebar({ isAdmin }: SidebarProps) {
+export default function Sidebar({ isAdmin, isOpen = false, onClose }: SidebarProps) {
     const pathname = usePathname();
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
@@ -94,7 +96,18 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
     const links = isAdmin ? adminLinks : engineerLinks;
 
     return (
-        <div className="w-64 bg-surface border-r border-border flex flex-col h-screen fixed left-0 top-0 text-foreground transition-all duration-300">
+        <>
+            {/* Mobile backdrop overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+                    onClick={onClose}
+                />
+            )}
+            <div className={cn(
+                "w-64 bg-surface border-r border-border flex flex-col h-screen fixed left-0 top-0 z-50 text-foreground transition-transform duration-300",
+                isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+            )}>
             <div className="p-6 flex justify-between items-center border-b border-border">
                 <Logo variant="horizontal" className="h-14 w-auto mx-auto" />
             </div>
@@ -147,6 +160,7 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
                     <span className="font-medium">Sign Out</span>
                 </button>
             </div>
-        </div>
+            </div>
+        </>
     );
 }

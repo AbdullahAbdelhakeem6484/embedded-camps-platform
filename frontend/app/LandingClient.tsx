@@ -6,7 +6,7 @@ import InfotainmentShowcase from '@/components/InfotainmentShowcase';
 import {
     BookOpen, Shield, Cpu, Layers, Bug, Rocket, Briefcase, HelpCircle,
     MessageCircle, Clock, ChevronRight, Terminal, Zap,
-    CheckCircle2, Sun, Moon, ArrowRight,
+    CheckCircle2, Sun, Moon, ArrowRight, Menu, X,
 } from 'lucide-react';
 import { getStoredUser, logout } from '@/lib/auth';
 import axios from 'axios';
@@ -192,6 +192,7 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
         document.documentElement.classList.toggle('dark', next === 'dark');
     };
 
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const isLoggedIn = !!userRole;
     const dashboardUrl = userRole === 'ADMIN' ? '/admin' : '/dashboard';
     const aosp = BRANDS[0];
@@ -213,31 +214,106 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
 
             {/* ─── Nav ─── */}
             <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
-                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Logo variant="horizontal" className="h-12" />
-                    <div className="flex items-center gap-4">
-                        <a href="#camps" className="text-sm text-text-muted hover:text-foreground transition-colors hidden sm:block">Camps</a>
-                        <a href="#curriculum" className="text-sm text-text-muted hover:text-foreground transition-colors hidden sm:block">Curriculum</a>
-                        <a href="#pricing" className="text-sm text-text-muted hover:text-foreground transition-colors hidden sm:block">Pricing</a>
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                    <Logo variant="horizontal" className="h-10 sm:h-12" />
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        {/* Desktop links */}
+                        <a href="#camps" className="text-sm text-text-muted hover:text-foreground transition-colors hidden md:block">Camps</a>
+                        <a href="#curriculum" className="text-sm text-text-muted hover:text-foreground transition-colors hidden md:block">Curriculum</a>
+                        <a href="#pricing" className="text-sm text-text-muted hover:text-foreground transition-colors hidden md:block">Pricing</a>
                         {mounted && (
                             <button onClick={toggleTheme} className="p-2 rounded-lg bg-surface-hover/50 border border-border hover:bg-surface-hover transition-all" aria-label="Toggle theme">
                                 {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-violet-500" />}
                             </button>
                         )}
+                        {/* Desktop auth buttons */}
                         {mounted && isLoggedIn ? (
-                            <div className="flex items-center gap-3">
+                            <div className="hidden sm:flex items-center gap-3">
                                 <Link href={dashboardUrl} className="text-sm px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white transition-all font-medium">Dashboard</Link>
                                 <button onClick={() => logout()} className="text-sm px-4 py-2 rounded-lg bg-surface-hover/50 border border-border hover:bg-red-500/20 hover:text-red-500 transition-all text-text-muted">Log Out</button>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="hidden sm:flex items-center gap-2">
                                 <Link href="/login" className="text-sm px-4 py-2 rounded-lg bg-surface-hover/50 border border-border hover:bg-surface-hover transition-all text-foreground">Login</Link>
-                                <a href={`https://wa.me/${WA}?text=${encodeURIComponent(aosp.enrollMsg ?? '')}`} target="_blank" rel="noopener noreferrer" className="text-sm px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-all font-medium hidden sm:block">Enroll via WhatsApp</a>
+                                <a href={`https://wa.me/${WA}?text=${encodeURIComponent(aosp.enrollMsg ?? '')}`} target="_blank" rel="noopener noreferrer" className="text-sm px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-all font-medium">Enroll via WhatsApp</a>
                             </div>
                         )}
+                        {/* Mobile hamburger */}
+                        <button
+                            onClick={() => setMobileMenuOpen(true)}
+                            className="sm:hidden p-2 rounded-lg bg-surface-hover/50 border border-border hover:bg-surface-hover transition-all"
+                            aria-label="Open menu"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </nav>
+
+            {/* ─── Mobile Menu Drawer ─── */}
+            {mobileMenuOpen && (
+                <div className="fixed inset-0 z-[60] sm:hidden">
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+                    <div className="absolute top-0 right-0 bottom-0 w-72 bg-background border-l border-border flex flex-col p-6 overflow-y-auto">
+                        <div className="flex items-center justify-between mb-8">
+                            <Logo variant="horizontal" className="h-9" />
+                            <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg hover:bg-surface-hover text-text-muted">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Nav links */}
+                        <div className="space-y-1 mb-6">
+                            {[
+                                { label: 'Camps', href: '#camps' },
+                                { label: 'Curriculum', href: '#curriculum' },
+                                { label: 'Pricing & FAQ', href: '#pricing' },
+                            ].map(({ label, href }) => (
+                                <a key={label} href={href} onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-text-muted hover:bg-surface-hover hover:text-foreground transition-all font-medium">
+                                    {label}
+                                </a>
+                            ))}
+                        </div>
+
+                        <div className="h-px bg-border mb-6" />
+
+                        {/* Auth section */}
+                        {mounted && isLoggedIn ? (
+                            <div className="space-y-3">
+                                <Link href={dashboardUrl} onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all">
+                                    Dashboard
+                                </Link>
+                                <button onClick={() => { logout(); setMobileMenuOpen(false); }}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border border-border text-text-muted hover:bg-red-500/10 hover:text-red-400 font-medium transition-all">
+                                    Log Out
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <a href={`https://wa.me/${WA}?text=${encodeURIComponent(aosp.enrollMsg ?? '')}`}
+                                    target="_blank" rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all">
+                                    <MessageCircle className="w-4 h-4" />Enroll via WhatsApp
+                                </a>
+                                <Link href="/login" onClick={() => setMobileMenuOpen(false)}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border border-border text-foreground hover:bg-surface-hover font-medium transition-all">
+                                    Login
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Theme toggle */}
+                        {mounted && (
+                            <button onClick={() => { toggleTheme(); }} className="mt-6 flex items-center gap-3 px-3 py-3 rounded-xl text-text-muted hover:bg-surface-hover transition-all font-medium">
+                                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-violet-500" />}
+                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* ─── Hero ─── */}
             <section className="hero-gradient relative min-h-screen flex items-center justify-center pt-24 overflow-hidden text-foreground">
