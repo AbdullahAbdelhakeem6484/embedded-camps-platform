@@ -595,8 +595,11 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
                             See what you'll build in the graduation project — a real Android infotainment system running on custom AOSP.
                         </p>
                     </div>
-                    <div className="max-w-3xl mx-auto">
-                        <InfotainmentShowcase />
+                    {/* Scrollable wrapper for mobile — demo needs min 600px to be usable */}
+                    <div className="overflow-x-auto -mx-6 sm:mx-0 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                        <div className="min-w-[600px] px-6 sm:px-0 max-w-3xl sm:mx-auto">
+                            <InfotainmentShowcase />
+                        </div>
                     </div>
                 </div>
             </section>

@@ -1186,7 +1186,7 @@ export default function InfotainmentShowcase() {
       </div>
 
       {/* Cockpit Shell container bezel */}
-      <div className={`relative rounded-[32px] border-[12px] p-1 shadow-2xl overflow-hidden aspect-[16/9] md:aspect-[2.1/1] transition-all duration-500 ${
+      <div className={`relative rounded-[32px] border-[12px] p-1 shadow-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] md:aspect-[2.1/1] transition-all duration-500 ${
         isCollisionWarning && currentSystem === 'adas'
           ? 'border-red-900 bg-red-950/20 bezel-alert-flash'
           : (cabinDriverState === 'drowsy' || cabinDriverState === 'distracted') && currentSystem === 'cabin'
