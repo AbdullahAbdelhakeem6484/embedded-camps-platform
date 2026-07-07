@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middlewares/errorHandler';
 import { uploadToCloudinary } from '../lib/cloudinary';
@@ -105,29 +105,41 @@ export const deleteMaterial = async (req: Request, res: Response) => {
 };
 
 // POST /api/sessions/upload/pdf  -> Cloudinary (raw)
-export const uploadPdf = async (req: Request, res: Response) => {
-    if (!req.file) throw new AppError('No file uploaded', 400);
-    const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/pdfs', 'raw', req.file.originalname);
-    res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+export const uploadPdf = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.file) return next(new AppError('No file uploaded', 400));
+        const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/pdfs', 'raw', req.file.originalname);
+        res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+    } catch (err) {
+        next(err);
+    }
 };
 
 // POST /api/sessions/upload/image  -> Cloudinary (image)
-export const uploadImage = async (req: Request, res: Response) => {
-    if (!req.file) throw new AppError('No file uploaded', 400);
-    const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/images', 'image', req.file.originalname);
-    res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+export const uploadImage = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.file) return next(new AppError('No file uploaded', 400));
+        const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/images', 'image', req.file.originalname);
+        res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+    } catch (err) {
+        next(err);
+    }
 };
 
 // POST /api/sessions/upload/video -> Cloudinary (video)
-export const uploadVideo = async (req: Request, res: Response) => {
-    if (!req.file) throw new AppError('No file uploaded', 400);
-    const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/videos', 'video', req.file.originalname);
-    res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+export const uploadVideo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.file) return next(new AppError('No file uploaded', 400));
+        const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/videos', 'video', req.file.originalname);
+        res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
+    } catch (err) {
+        next(err);
+    }
 };
 
 // POST /api/sessions/upload/video-url
-export const registerVideoUrl = async (req: Request, res: Response) => {
+export const registerVideoUrl = (req: Request, res: Response, next: NextFunction) => {
     const { url, title } = req.body;
-    if (!url) throw new AppError('URL is required', 400);
+    if (!url) return next(new AppError('URL is required', 400));
     res.json({ url, title: title || 'Video' });
 };

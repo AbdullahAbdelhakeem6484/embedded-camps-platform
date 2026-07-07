@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middlewares/errorHandler';
@@ -27,27 +27,31 @@ export const submitQuizSchema = z.object({
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
 // POST /api/quizzes — admin creates a quiz
-export const createQuiz = async (req: Request, res: Response) => {
-    const { title, masterSessionId, passMark, questions } = req.body;
+export const createQuiz = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { title, masterSessionId, passMark, questions } = req.body;
 
-    const quiz = await prisma.quiz.create({
-        data: {
-            title,
-            masterSessionId,
-            passMark,
-            questions: {
-                create: questions.map((q: any, i: number) => ({
-                    text: q.text,
-                    options: q.options,
-                    correctOption: q.correctOption,
-                    explanation: q.explanation,
-                    order: i,
-                })),
+        const quiz = await prisma.quiz.create({
+            data: {
+                title,
+                masterSessionId,
+                passMark,
+                questions: {
+                    create: questions.map((q: any, i: number) => ({
+                        text: q.text,
+                        options: q.options,
+                        correctOption: q.correctOption,
+                        explanation: q.explanation,
+                        order: i,
+                    })),
+                },
             },
-        },
-        include: { questions: { orderBy: { order: 'asc' } } },
-    });
-    res.status(201).json(quiz);
+            include: { questions: { orderBy: { order: 'asc' } } },
+        });
+        res.status(201).json(quiz);
+    } catch (err) {
+        next(err);
+    }
 };
 
 // DELETE /api/quizzes/:id
