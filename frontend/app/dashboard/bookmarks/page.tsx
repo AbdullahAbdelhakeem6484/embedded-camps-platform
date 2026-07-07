@@ -154,4 +154,8 @@ export default function BookmarksPage() {
                             </div>
                         );
                     })}
-           
+                </div>
+            )}
+        </div>
+    );
+}

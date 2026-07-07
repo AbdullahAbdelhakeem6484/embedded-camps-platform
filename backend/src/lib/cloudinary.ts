@@ -35,10 +35,17 @@ export async function uploadToCloudinary(
 ): Promise<{ url: string; publicId: string; bytes: number }> {
     return new Promise((resolve, reject) => {
         const timestamp = Date.now();
-        const safeName = originalName
+        // Extract the extension BEFORE sanitising (e.g. '.pdf', '.mp4')
+        const ext = (originalName || '').match(/\.[^./\\]+$/)?.[0]?.toLowerCase() || '';
+        const baseName = originalName
             ? originalName.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '')
             : `file_${timestamp}`;
-        const publicId = `${folder}/${timestamp}_${safeName}`;
+        // Raw files (PDF, etc.) MUST keep their extension in the public_id so
+        // Cloudinary serves them with the correct Content-Type header.
+        // Images and videos have Content-Type inferred from the file content.
+        const publicId = resourceType === 'raw'
+            ? `${folder}/${timestamp}_${baseName}${ext}`
+            : `${folder}/${timestamp}_${baseName}`;
 
         console.log(`[cloudinary] uploading ${originalName} → ${publicId} (${resourceType}, ${buffer.length} bytes)`);
 

@@ -75,7 +75,7 @@ function MaterialIcon({ type }: { type: MaterialType }) {
 
 function VideoPreview({ url }: { url: string }) {
     if (!url) return null;
-    // Bunny.net embed or direct video
+    // Bunny.net / iframe embed
     const isBunnyEmbed = url.includes('iframe.mediadelivery.net') || url.includes('bunny.net');
     if (isBunnyEmbed) {
         return (
@@ -84,9 +84,19 @@ function VideoPreview({ url }: { url: string }) {
             </div>
         );
     }
-    // Direct video file
+    // YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        const embedUrl = url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
+        return (
+            <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
+                <iframe src={embedUrl} className="absolute inset-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+            </div>
+        );
+    }
+    // Cloudinary video or direct video file — browser uses Content-Type from server
+    const isCloudinaryVideo = url.includes('res.cloudinary.com') && url.includes('/video/');
     const isVideoFile = /\.(mp4|webm|ogg|mov)$/i.test(url);
-    if (isVideoFile || url.startsWith('/uploads')) {
+    if (isCloudinaryVideo || isVideoFile || url.startsWith('/uploads')) {
         const src = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${url}`;
         return (
             <video controls className="w-full rounded-xl bg-black aspect-video" src={src}>
@@ -108,21 +118,29 @@ function PdfPreview({ url }: { url: string }) {
     if (!url) return null;
     const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const src = url.startsWith('http') ? url : `${API}${url}`;
+
+    // Use Google Docs viewer for reliable cross-browser PDF rendering,
+    // especially for Cloudinary "raw" URLs which may lack a .pdf extension.
+    const hasPdfExt = /\.pdf$/i.test(src);
+    const viewerSrc = hasPdfExt
+        ? src  // native browser PDF viewer works when extension is present
+        : `https://docs.google.com/viewer?url=${encodeURIComponent(src)}&embedded=true`;
+
     return (
         <div className="rounded-xl overflow-hidden border border-white/10 bg-zinc-900 flex flex-col" style={{ height: 620 }}>
-            {/* Toolbar */}
             <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10 shrink-0">
-                <span className="text-xs text-gray-400 truncate">{url.split('/').pop()}</span>
+                <span className="text-xs text-gray-400 truncate">{src.split('/').pop()}</span>
                 <a
                     href={src}
+                    download
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
                 >
-                    <ExternalLink className="w-3 h-3" /> Open in new tab
+                    <ExternalLink className="w-3 h-3" /> Open / Download
                 </a>
             </div>
-            <iframe src={src} className="w-full flex-1" title="PDF Preview" />
+            <iframe src={viewerSrc} className="w-full flex-1" title="PDF Preview" />
         </div>
     );
 }
@@ -982,4 +1000,24 @@ export default function MasterSessionDetailsPage({ params }: { params: any }) {
                                     : 'border-transparent text-gray-400 hover:text-white'
                             }`}
                         >
-                            {t === 'materials' && `Materials ${session.mat
+                            {t === 'materials' && `Materials ${session.materials.length}`}
+                            {t === 'labs' && `Labs ${session.labs.length}`}
+                            {t === 'quizzes' && `Quizzes ${session.quizzes.length}`}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Tab Content */}
+                {tab === 'materials' && (
+                    <MaterialsTab session={session} onUpdate={fetchSession} />
+                )}
+                {tab === 'labs' && (
+                    <LabsTab session={session} onUpdate={fetchSession} />
+                )}
+                {tab === 'quizzes' && (
+                    <QuizzesTab session={session} onUpdate={fetchSession} />
+                )}
+            </div>
+        </div>
+    );
+}

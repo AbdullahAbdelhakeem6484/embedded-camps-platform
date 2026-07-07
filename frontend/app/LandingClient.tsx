@@ -512,4 +512,186 @@ export default function LandingClient({ courses, faqs, whatsappUrl, enrollUrl }:
                                         )}
 
                                         {/* Topic Tags */}
-                                        <div className="
+                                        <div className="flex flex-wrap gap-2 mb-5">
+                                            {brand.topics.map(t => (
+                                                <span key={t} className={`text-xs px-2.5 py-1 rounded-lg font-medium border ${theme.tagStyle}`}>{t}</span>
+                                            ))}
+                                        </div>
+
+                                        {/* Description */}
+                                        {brand.desc && (
+                                            <p className="text-sm text-gray-400 leading-relaxed mb-6">{brand.desc}</p>
+                                        )}
+
+                                        {/* CTAs */}
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            {isLiveInDb && dbCamp ? (
+                                                <Link href={`/camps/${dbCamp.slug}`}
+                                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold transition-all text-sm">
+                                                    <ArrowRight className="w-4 h-4" />View Camp
+                                                </Link>
+                                            ) : (
+                                                <a href={`https://wa.me/${WA}?text=${encodeURIComponent(brand.notifyMsg ?? '')}`}
+                                                    target="_blank" rel="noopener noreferrer"
+                                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all text-sm ${theme.btn}`}>
+                                                    <MessageCircle className="w-4 h-4" />Notify Me on WhatsApp
+                                                </a>
+                                            )}
+                                            {brand.href && (
+                                                <Link href={brand.href}
+                                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all text-sm border ${theme.btnOutline}`}>
+                                                    View Full Curriculum<ArrowRight className="w-4 h-4" />
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* ── Right: course list ── */}
+                                    {brand.courses && brand.courses.length > 0 && (
+                                        <div>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">
+                                                Complete {brand.courses.length}-Course Curriculum
+                                            </p>
+                                            <div className="space-y-2">
+                                                {brand.courses.map((c, i) => (
+                                                    <div key={i} className="flex items-center gap-3 p-3 bg-surface-hover/30 rounded-xl border border-border hover:border-white/10 transition-all">
+                                                        <div className={`w-8 h-8 rounded-lg ${theme.iconBg} flex items-center justify-center shrink-0`}>
+                                                            <span className="text-[11px] font-mono font-bold" style={{ color: theme.numColor }}>
+                                                                {String(i).padStart(2, '0')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-sm font-medium text-foreground">{c.title}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {brand.href && (
+                                                <Link href={brand.href}
+                                                    className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold ${theme.accent} hover:opacity-80 transition-opacity`}>
+                                                    See full curriculum, modules & labs →
+                                                </Link>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Infotainment Demo ─── */}
+            <section className="py-20 border-t border-b border-white/5 relative">
+                <div className="max-w-6xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 mb-4 text-xs font-semibold text-violet-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />⚙️ AOSPCamp Demo
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                            Interactive{' '}
+                            <span className="brand-gradient-text">AOSPCamp Demo</span>
+                        </h2>
+                        <p className="text-gray-400 mt-3 max-w-xl mx-auto text-sm">
+                            See what you'll build in the graduation project — a real Android infotainment system running on custom AOSP.
+                        </p>
+                    </div>
+                    {/* Scrollable wrapper for mobile — demo needs min 600px to be usable */}
+                    <div className="overflow-x-auto -mx-6 sm:mx-0 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                        <div className="min-w-[600px] px-6 sm:px-0 max-w-3xl sm:mx-auto">
+                            <InfotainmentShowcase />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Why EmbeddedCamps ─── */}
+            <section id="curriculum" className="py-24 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl sm:text-4xl font-bold">Why Engineers Choose EmbeddedCamps</h2>
+                        <p className="mt-4 text-gray-400 max-w-xl mx-auto">Not a theory course. Not a YouTube playlist. Real engineering with real hardware.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[
+                            { icon: Cpu, color: 'text-violet-400', bg: 'bg-violet-500/10', title: 'Real Hardware Labs', desc: 'Build on Raspberry Pi 4 running custom AOSP. Flash images, write HALs, debug with JTAG — real engineering, not simulation.' },
+                            { icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10', title: 'Project-Based Learning', desc: '35+ hands-on labs and 30 graduation project choices. Build a portfolio that proves your skills to automotive and embedded employers.' },
+                            { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', title: 'Industry-Current Content', desc: 'AIDL/HIDL, Treble, seamless A/B OTA, SELinux — the exact skills automotive and consumer electronics companies are hiring for now.' },
+                            { icon: Clock, color: 'text-sky-400', bg: 'bg-sky-500/10', title: 'Self-Paced + Live Support', desc: 'Watch on your schedule, but never alone. Weekly live Q&A, a private WhatsApp group, and direct instructor access.' },
+                            { icon: Briefcase, color: 'text-rose-400', bg: 'bg-rose-500/10', title: 'Career Coaching Included', desc: 'Technical interviews, resume reviews, salary negotiation — Course 07 prepares you for FAANG/automotive job hunts.' },
+                            { icon: Shield, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', title: 'Verified Certificate', desc: 'Earn a verifiable certificate tied to a public URL. Share on LinkedIn, include in your resume, prove your expertise.' },
+                        ].map(({ icon: Icon, color, bg, title, desc }) => (
+                            <div key={title} className="bg-surface border border-border rounded-2xl p-6 hover:border-violet-500/20 transition-all">
+                                <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-4`}>
+                                    <Icon className={`w-5 h-5 ${color}`} />
+                                </div>
+                                <h3 className="font-bold mb-2">{title}</h3>
+                                <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── FAQ ─── */}
+            <section id="faq" className="py-24 px-6 bg-surface/50 border-t border-b border-border">
+                <div className="max-w-3xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
+                        <p className="text-gray-400 mt-3">Still have questions? Message us on WhatsApp and we'll reply within hours.</p>
+                    </div>
+                    <div className="space-y-4">
+                        {faqs.map(({ q, a }) => (
+                            <div key={q} className="bg-surface border border-border rounded-2xl p-6">
+                                <h3 className="font-semibold mb-2 flex items-start gap-2">
+                                    <HelpCircle className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
+                                    {q}
+                                </h3>
+                                <p className="text-sm text-gray-400 leading-relaxed pl-6">{a}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Final CTA ─── */}
+            <section id="pricing" className="py-32 px-6 relative overflow-hidden">
+                <div className="absolute inset-0 hero-gradient opacity-30" />
+                <div className="relative max-w-3xl mx-auto text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 text-xs font-semibold text-emerald-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />50% Launch Discount — Limited Seats
+                    </div>
+                    <h2 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight">
+                        Start Your <span className="brand-gradient-text">Engineering</span> Journey Today
+                    </h2>
+                    <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+                        Message us on WhatsApp. We confirm your seat, you pay, and your account is live within 24 hours.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href={enrollUrl} target="_blank" rel="noopener noreferrer"
+                            className="whatsapp-btn flex items-center gap-2.5 px-8 py-4 rounded-xl text-white font-bold text-base shadow-xl">
+                            <MessageCircle className="w-5 h-5" />Enroll Now via WhatsApp
+                        </a>
+                        <Link href="/login"
+                            className="flex items-center gap-2 px-8 py-4 rounded-xl border border-border text-foreground hover:bg-surface-hover transition-all font-medium">
+                            Already enrolled? Log in
+                        </Link>
+                    </div>
+                    <p className="mt-6 text-xs text-gray-600">🔒 Secure payment via InstaPay (Egypt) or IBAN bank transfer (international)</p>
+                </div>
+            </section>
+
+            {/* ─── Footer ─── */}
+            <footer className="border-t border-border py-12 px-6">
+                <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-3">
+                        <Logo variant="horizontal" className="h-8" />
+                    </div>
+                    <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()} EmbeddedCamps. All rights reserved.</p>
+                    <div className="flex items-center gap-4">
+                        <a href="mailto:info@embeddedcamps.com" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Contact</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+}

@@ -161,4 +161,8 @@ export default function QuizHistoryPage() {
                             </div>
                         );
                     })}
-           
+                </div>
+            )}
+        </div>
+    );
+}

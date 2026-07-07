@@ -113,4 +113,9 @@ export default function LoginPage() {
                         className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
                     >
                         Contact us on WhatsApp to enroll
-             
+                    </a>
+                </p>
+            </div>
+        </div>
+    );
+}
