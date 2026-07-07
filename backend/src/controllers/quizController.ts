@@ -61,7 +61,7 @@ export const deleteQuiz = async (req: Request, res: Response) => {
     res.json({ message: 'Quiz deleted' });
 };
 
-// GET /api/quizzes/session/:sessionId — get quiz for a session (strips answers for students)
+// GET /api/quizzes/session/:sessionId
 export const getQuizBySession = async (req: AuthRequest, res: Response) => {
     const quiz = await prisma.quiz.findFirst({
         where: { masterSessionId: req.params.sessionId },
@@ -72,7 +72,6 @@ export const getQuizBySession = async (req: AuthRequest, res: Response) => {
                     text: true,
                     options: true,
                     order: true,
-                    // Only include correct answer + explanation for admins
                     ...(req.user.role === 'ADMIN' && {
                         correctOption: true,
                         explanation: true,
@@ -103,7 +102,6 @@ export const submitQuizAttempt = async (req: AuthRequest, res: Response) => {
 
     await EnrollmentService.findActiveForSession(req.user.id, quiz.masterSessionId);
 
-    // Check for existing passed attempt
     const previousPass = await prisma.quizAttempt.findFirst({
         where: { quizId, userId: req.user.id, passed: true },
     });
@@ -113,7 +111,6 @@ export const submitQuizAttempt = async (req: AuthRequest, res: Response) => {
         throw new AppError(`Expected ${quiz.questions.length} answers, got ${answers.length}`, 422);
     }
 
-    // Server-side grading
     const breakdown = quiz.questions.map((q, i) => ({
         questionId: q.id,
         studentAnswer: answers[i],
@@ -142,4 +139,9 @@ export const submitQuizAttempt = async (req: AuthRequest, res: Response) => {
 // GET /api/quizzes/my-attempts
 export const getMyQuizAttempts = async (req: AuthRequest, res: Response) => {
     const attempts = await prisma.quizAttempt.findMany({
-        where: { userId: req.use
+        where: { userId: req.user.id },
+        include: { quiz: { select: { id: true, title: true, passMark: true } } },
+        orderBy: { createdAt: 'desc' },
+    });
+    res.json(attempts);
+};
