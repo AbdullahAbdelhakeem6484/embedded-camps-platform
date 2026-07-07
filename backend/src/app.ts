@@ -1,4 +1,3 @@
-import 'express-async-errors'; // Must be first — patches Express 4 to forward async rejections to next(err)
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
