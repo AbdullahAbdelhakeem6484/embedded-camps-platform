@@ -21,8 +21,9 @@ export const createCampSchema = z.object({
     whatYouLearn: z.array(z.string()).optional(),
     prerequisites: z.array(z.string()).optional(),
     brandId: z.string().uuid().optional().nullable(),
-    startDate: z.string().datetime().optional().nullable(),
-    endDate: z.string().datetime().optional().nullable(),
+    // Accept ISO datetime ("2026-08-01T00:00:00.000Z") or plain date ("2026-08-01")
+    startDate: z.string().optional().nullable(),
+    endDate: z.string().optional().nullable(),
 });
 
 export const updateCampSchema = createCampSchema.partial();

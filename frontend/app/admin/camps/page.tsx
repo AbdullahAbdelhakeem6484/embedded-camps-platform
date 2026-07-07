@@ -105,12 +105,13 @@ export default function AdminCampsPage() {
                 description: form.description || undefined,
                 thumbnail: form.thumbnail || undefined,
                 price: Number(form.price),
-                startDate: form.startDate || undefined,
-                endDate: form.endDate || undefined,
+                // Zod backend expects ISO 8601 datetime, not bare date string
+                startDate: form.startDate ? new Date(form.startDate).toISOString() : undefined,
+                endDate: form.endDate ? new Date(form.endDate).toISOString() : undefined,
                 status: form.status,
                 level: form.level,
                 language: form.language,
-                brandId: form.brandId || undefined,
+                brandId: form.brandId || null, // null = remove brand, undefined = no-op
                 whatYouLearn: form.whatYouLearn ? form.whatYouLearn.split('\n').map(s => s.trim()).filter(Boolean) : undefined,
                 prerequisites: form.prerequisites ? form.prerequisites.split('\n').map(s => s.trim()).filter(Boolean) : undefined,
             };
