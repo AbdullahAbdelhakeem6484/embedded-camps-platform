@@ -982,24 +982,4 @@ export default function MasterSessionDetailsPage({ params }: { params: any }) {
                                     : 'border-transparent text-gray-400 hover:text-white'
                             }`}
                         >
-                            {t === 'materials' && `Materials ${session.materials.length}`}
-                            {t === 'labs' && `Labs ${session.labs.length}`}
-                            {t === 'quizzes' && `Quizzes ${session.quizzes.length}`}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Tab Content */}
-                {tab === 'materials' && (
-                    <MaterialsTab session={session} onUpdate={fetchSession} />
-                )}
-                {tab === 'labs' && (
-                    <LabsTab session={session} onUpdate={fetchSession} />
-                )}
-                {tab === 'quizzes' && (
-                    <QuizzesTab session={session} onUpdate={fetchSession} />
-                )}
-            </div>
-        </div>
-    );
-}
+                            {t === 'materials' && `Materials ${session.mat

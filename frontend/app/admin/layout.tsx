@@ -36,24 +36,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Mobile top bar */}
             <header className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-background border-b border-border flex items-center px-4 gap-3">
                 <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="p-2 rounded-lg text-text-muted hover:bg-surface-hover hover:text-foreground transition-colors"
-                    aria-label="Open menu"
-                >
-                    <Menu className="w-5 h-5" />
-                </button>
-                <Logo variant="horizontal" className="h-9 w-auto" />
-            </header>
-
-            <Sidebar isAdmin isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-            <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 p-4 sm:p-6 lg:p-8">
-                <div className="max-w-6xl mx-auto">
-                    <ErrorBoundary>
-                        {children}
-                    </ErrorBoundary>
-                </div>
-            </main>
-        </div>
-    );
-}

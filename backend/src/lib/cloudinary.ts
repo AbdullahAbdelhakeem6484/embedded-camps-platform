@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { Readable } from 'stream';
 
 const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const API_KEY    = process.env.CLOUDINARY_API_KEY;
@@ -67,12 +66,13 @@ export async function uploadToCloudinary(
             },
         );
 
-        // Pipe buffer as Readable stream — more reliable than uploadStream.end(buffer)
         uploadStream.on('error', (err) => {
             console.error('[cloudinary] stream write error:', err);
             reject(err);
         });
-        Readable.from(buffer).pipe(uploadStream);
+
+        // Official Cloudinary v2 approach: write buffer directly to the upload stream
+        uploadStream.end(buffer);
     });
 }
 

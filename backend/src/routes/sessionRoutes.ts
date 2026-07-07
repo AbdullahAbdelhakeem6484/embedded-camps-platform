@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import cloudinary from '../lib/cloudinary';
 import {
     createMasterSession, getAllMasterSessions, getMasterSessionById,
     updateMasterSession, deleteMasterSession,
@@ -16,6 +17,28 @@ const memUpload = multer({ storage: multer.memoryStorage() });
 const pdfUpload   = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50  * 1024 * 1024 }, fileFilter: (_r, f, cb) => f.mimetype === 'application/pdf'      ? cb(null, true) : cb(new Error('Only PDF files allowed'))   }).single('file');
 const imageUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10  * 1024 * 1024 }, fileFilter: (_r, f, cb) => f.mimetype.startsWith('image/')        ? cb(null, true) : cb(new Error('Only image files allowed')) }).single('file');
 const videoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 }, fileFilter: (_r, f, cb) => f.mimetype.startsWith('video/')        ? cb(null, true) : cb(new Error('Only video files allowed')) }).single('file');
+
+// Cloudinary credential check (admin only — safe diagnostic endpoint)
+router.get('/upload/ping', authenticate, authorize(['ADMIN']), async (req, res, next) => {
+    try {
+        const result = await cloudinary.api.ping();
+        res.json({
+            ok: true,
+            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            apiKeySet: !!process.env.CLOUDINARY_API_KEY,
+            apiSecretSet: !!process.env.CLOUDINARY_API_SECRET,
+            cloudinaryResponse: result,
+        });
+    } catch (err: any) {
+        res.status(500).json({
+            ok: false,
+            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            apiKeySet: !!process.env.CLOUDINARY_API_KEY,
+            apiSecretSet: !!process.env.CLOUDINARY_API_SECRET,
+            error: err?.message || String(err),
+        });
+    }
+});
 
 // Upload routes
 router.post('/upload/pdf',       authenticate, authorize(['ADMIN']), pdfUpload,   uploadPdf);

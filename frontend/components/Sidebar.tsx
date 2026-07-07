@@ -149,18 +149,4 @@ export default function Sidebar({ isAdmin, isOpen = false, onClose }: SidebarPro
                             <Moon className="w-5 h-5 text-violet-400" />
                             <span className="font-medium">Dark Mode</span>
                         </>
-                    )}
-                </button>
-
-                <button
-                    onClick={logout}
-                    className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-text-muted hover:bg-red-500/10 hover:text-red-400 transition-all"
-                >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium">Sign Out</span>
-                </button>
-            </div>
-            </div>
-        </>
-    );
-}
+       

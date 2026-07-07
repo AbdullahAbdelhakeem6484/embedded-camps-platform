@@ -142,9 +142,4 @@ export const submitQuizAttempt = async (req: AuthRequest, res: Response) => {
 // GET /api/quizzes/my-attempts
 export const getMyQuizAttempts = async (req: AuthRequest, res: Response) => {
     const attempts = await prisma.quizAttempt.findMany({
-        where: { userId: req.user.id },
-        include: { quiz: { select: { id: true, title: true, passMark: true } } },
-        orderBy: { createdAt: 'desc' },
-    });
-    res.json(attempts);
-};
+        where: { userId: req.use

@@ -110,8 +110,9 @@ export const uploadPdf = async (req: Request, res: Response, next: NextFunction)
         if (!req.file) return next(new AppError('No file uploaded', 400));
         const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/pdfs', 'raw', req.file.originalname);
         res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
-    } catch (err) {
-        next(err);
+    } catch (err: any) {
+        // Forward the real Cloudinary error message so the client can see it
+        next(new AppError(`PDF upload failed: ${err?.message || 'Cloudinary error'}`, 500));
     }
 };
 
@@ -121,8 +122,8 @@ export const uploadImage = async (req: Request, res: Response, next: NextFunctio
         if (!req.file) return next(new AppError('No file uploaded', 400));
         const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/images', 'image', req.file.originalname);
         res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
-    } catch (err) {
-        next(err);
+    } catch (err: any) {
+        next(new AppError(`Image upload failed: ${err?.message || 'Cloudinary error'}`, 500));
     }
 };
 
@@ -132,8 +133,8 @@ export const uploadVideo = async (req: Request, res: Response, next: NextFunctio
         if (!req.file) return next(new AppError('No file uploaded', 400));
         const result = await uploadToCloudinary(req.file.buffer, 'embeddedcamps/videos', 'video', req.file.originalname);
         res.json({ url: result.url, originalName: req.file.originalname, size: result.bytes });
-    } catch (err) {
-        next(err);
+    } catch (err: any) {
+        next(new AppError(`Video upload failed: ${err?.message || 'Cloudinary error'}`, 500));
     }
 };
 
