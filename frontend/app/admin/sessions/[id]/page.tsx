@@ -756,7 +756,14 @@ function QuizzesTab({ session, onUpdate }: { session: Session; onUpdate: () => v
         e.preventDefault();
         setSaving(true);
         try {
-            await api.post('/quizzes', { ...form, masterSessionId: session.id, questions });
+            // Backend expects correctOption, frontend uses correctIndex
+            const normalizedQuestions = questions.map(q => ({
+                text: q.text,
+                options: q.options.filter(o => o.trim()),
+                correctOption: q.correctIndex,
+                explanation: q.explanation || undefined,
+            }));
+            await api.post('/quizzes', { ...form, masterSessionId: session.id, questions: normalizedQuestions });
             toast.success('Quiz added');
             setShowAdd(false);
             setForm({ title: '', passMark: 70 });
