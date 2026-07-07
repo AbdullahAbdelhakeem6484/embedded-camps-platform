@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
 const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const API_KEY    = process.env.CLOUDINARY_API_KEY;
@@ -40,6 +41,8 @@ export async function uploadToCloudinary(
             : `file_${timestamp}`;
         const publicId = `${folder}/${timestamp}_${safeName}`;
 
+        console.log(`[cloudinary] uploading ${originalName} → ${publicId} (${resourceType}, ${buffer.length} bytes)`);
+
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 resource_type: resourceType,
@@ -47,7 +50,15 @@ export async function uploadToCloudinary(
                 overwrite: true,
             },
             (error, result) => {
-                if (error || !result) return reject(error ?? new Error('Cloudinary upload failed'));
+                if (error) {
+                    console.error('[cloudinary] upload_stream error:', JSON.stringify(error));
+                    return reject(new Error(error.message || 'Cloudinary upload failed'));
+                }
+                if (!result) {
+                    console.error('[cloudinary] upload_stream: no result returned');
+                    return reject(new Error('Cloudinary upload failed: no result'));
+                }
+                console.log(`[cloudinary] upload success → ${result.secure_url}`);
                 resolve({
                     url: result.secure_url,
                     publicId: result.public_id,
@@ -56,7 +67,12 @@ export async function uploadToCloudinary(
             },
         );
 
-        uploadStream.end(buffer);
+        // Pipe buffer as Readable stream — more reliable than uploadStream.end(buffer)
+        uploadStream.on('error', (err) => {
+            console.error('[cloudinary] stream write error:', err);
+            reject(err);
+        });
+        Readable.from(buffer).pipe(uploadStream);
     });
 }
 

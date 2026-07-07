@@ -238,8 +238,10 @@ function MaterialModal({ sessionId, onClose, onSaved, editing }: MaterialModalPr
             setUrl(data.url);
             if (!title) setTitle(data.originalName.replace(/\.[^.]+$/, ''));
             toast.success('Video uploaded');
-        } catch {
-            toast.error('Failed to upload video');
+        } catch (err: any) {
+            const msg = err?.response?.data?.message || err?.message || 'Failed to upload video';
+            toast.error(`Video upload failed: ${msg}`);
+            console.error('Video upload error:', err?.response?.data || err);
         } finally {
             setUploading(false);
         }
@@ -260,8 +262,10 @@ function MaterialModal({ sessionId, onClose, onSaved, editing }: MaterialModalPr
             setUrl(data.url);
             if (!title) setTitle(data.originalName.replace(/\.[^.]+$/, ''));
             toast.success('PDF uploaded');
-        } catch {
-            toast.error('Failed to upload PDF');
+        } catch (err: any) {
+            const msg = err?.response?.data?.message || err?.message || 'Failed to upload PDF';
+            toast.error(`PDF upload failed: ${msg}`);
+            console.error('PDF upload error:', err?.response?.data || err);
         } finally {
             setUploading(false);
         }
