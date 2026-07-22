@@ -115,18 +115,51 @@ export const getOrderStats = async (_req: AuthRequest, res: Response) => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [totalRevenue, monthRevenue, pending, verified] = await prisma.$transaction([
-        prisma.order.aggregate({ where: { status: 'VERIFIED' }, _sum: { amount: true }, _count: true }),
-        prisma.order.aggregate({ where: { status: 'VERIFIED', verifiedAt: { gte: startOfMonth } }, _sum: { amount: true }, _count: true }),
+    const [
+        totalEGP,
+        totalUSD,
+        monthEGP,
+        monthUSD,
+        pending,
+        verified,
+        paidCount,
+        freeCount
+    ] = await prisma.$transaction([
+        prisma.order.aggregate({ where: { status: 'VERIFIED', currency: 'EGP' }, _sum: { amount: true }, _count: true }),
+        prisma.order.aggregate({ where: { status: 'VERIFIED', currency: 'USD' }, _sum: { amount: true }, _count: true }),
+        prisma.order.aggregate({ where: { status: 'VERIFIED', currency: 'EGP', verifiedAt: { gte: startOfMonth } }, _sum: { amount: true }, _count: true }),
+        prisma.order.aggregate({ where: { status: 'VERIFIED', currency: 'USD', verifiedAt: { gte: startOfMonth } }, _sum: { amount: true }, _count: true }),
         prisma.order.count({ where: { status: 'PENDING' } }),
         prisma.order.count({ where: { status: 'VERIFIED' } }),
+        prisma.order.count({ where: { status: 'VERIFIED', amount: { gt: 0 } } }),
+        prisma.order.count({ where: { status: 'VERIFIED', amount: 0 } }),
     ]);
 
+    const totalRevenueEGP = Number(totalEGP._sum.amount ?? 0);
+    const totalOrdersEGP = totalEGP._count;
+    const totalRevenueUSD = Number(totalUSD._sum.amount ?? 0);
+    const totalOrdersUSD = totalUSD._count;
+
+    const monthRevenueEGP = Number(monthEGP._sum.amount ?? 0);
+    const monthOrdersEGP = monthEGP._count;
+    const monthRevenueUSD = Number(monthUSD._sum.amount ?? 0);
+    const monthOrdersUSD = monthUSD._count;
+
     res.json({
-        totalRevenue: Number(totalRevenue._sum.amount ?? 0),
-        totalOrders: totalRevenue._count,
-        monthRevenue: Number(monthRevenue._sum.amount ?? 0),
-        monthOrders: monthRevenue._count,
+        totalRevenue: totalRevenueUSD, // backward compatibility
+        totalOrders: totalOrdersEGP + totalOrdersUSD, // backward compatibility
+        monthRevenue: monthRevenueUSD, // backward compatibility
+        monthOrders: monthOrdersEGP + monthOrdersUSD, // backward compatibility
+        totalRevenueEGP,
+        totalRevenueUSD,
+        totalOrdersEGP,
+        totalOrdersUSD,
+        monthRevenueEGP,
+        monthRevenueUSD,
+        monthOrdersEGP,
+        monthOrdersUSD,
+        paidCount,
+        freeCount,
         pending,
         verified,
     });

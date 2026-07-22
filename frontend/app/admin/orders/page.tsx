@@ -31,6 +31,16 @@ interface Stats {
     totalOrders: number;
     monthRevenue: number;
     monthOrders: number;
+    totalRevenueEGP: number;
+    totalRevenueUSD: number;
+    totalOrdersEGP: number;
+    totalOrdersUSD: number;
+    monthRevenueEGP: number;
+    monthRevenueUSD: number;
+    monthOrdersEGP: number;
+    monthOrdersUSD: number;
+    paidCount: number;
+    freeCount: number;
     pending: number;
     verified: number;
 }
@@ -172,19 +182,42 @@ export default function AdminOrdersPage() {
 
             {/* Stats */}
             {stats && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {[
-                        { label: 'Total Revenue', value: `$${stats.totalRevenue.toLocaleString()}`, color: 'text-emerald-400', sub: `${stats.totalOrders} verified orders` },
-                        { label: 'This Month', value: `$${stats.monthRevenue.toLocaleString()}`, color: 'text-violet-400', sub: `${stats.monthOrders} orders` },
-                        { label: 'Pending', value: stats.pending, color: 'text-amber-400', sub: 'awaiting verification' },
-                        { label: 'Verified', value: stats.verified, color: 'text-sky-400', sub: 'all time' },
-                    ].map(s => (
-                        <div key={s.label} className="bg-[#111113] border border-white/5 rounded-2xl p-5">
-                            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-                            <p className="text-xs font-medium text-gray-400 mt-0.5">{s.label}</p>
-                            <p className="text-[11px] text-gray-600 mt-0.5">{s.sub}</p>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div className="bg-[#111113] border border-white/5 rounded-2xl p-5">
+                        <p className="text-2xl font-bold text-emerald-400">
+                            EGP {(stats.totalRevenueEGP || 0).toLocaleString()}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 mt-0.5">Total Revenue (EGP)</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">This Month: EGP {(stats.monthRevenueEGP || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-[#111113] border border-white/5 rounded-2xl p-5">
+                        <p className="text-2xl font-bold text-emerald-400">
+                            ${(stats.totalRevenueUSD || 0).toLocaleString()}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 mt-0.5">Total Revenue (USD)</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">This Month: ${(stats.monthRevenueUSD || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-[#111113] border border-white/5 rounded-2xl p-5">
+                        <p className="text-2xl font-bold text-sky-400">
+                            {stats.paidCount || 0} / {stats.freeCount || 0}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 mt-0.5">Paid / Free Students</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">Verified enrollments</p>
+                    </div>
+                    <div className="bg-[#111113] border border-white/5 rounded-2xl p-5">
+                        <p className="text-2xl font-bold text-amber-400">
+                            {stats.pending || 0}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 mt-0.5">Pending Orders</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">Awaiting verification</p>
+                    </div>
+                    <div className="bg-[#111113] border border-white/5 rounded-2xl p-5">
+                        <p className="text-2xl font-bold text-violet-400">
+                            {stats.verified || 0}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 mt-0.5">Verified Orders</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">Total registered</p>
+                    </div>
                 </div>
             )}
 
@@ -219,7 +252,7 @@ export default function AdminOrdersPage() {
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Amount *</label>
-                                <input required type="number" min={1} step="0.01" placeholder="100" className={inputCls} value={form.amount} onChange={set('amount')} />
+                                <input required type="number" min={0} step="0.01" placeholder="100" className={inputCls} value={form.amount} onChange={set('amount')} />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Currency</label>
