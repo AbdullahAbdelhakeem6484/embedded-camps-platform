@@ -390,15 +390,8 @@ export const downloadCertificate = async (req: Request, res: Response) => {
         data: { downloadsCount: { increment: 1 } }
     });
 
-    // Stream PDF from Cloudinary with proper attachment headers
-    https.get(cert.pdfUrl, (pdfStream) => {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=Certificate_${cert.certificateId || cert.id}.pdf`);
-        pdfStream.pipe(res);
-    }).on('error', (err) => {
-        logger.error(`Error streaming certificate PDF for ${certificateId}:`, err);
-        res.status(500).json({ message: 'Failed to download certificate PDF' });
-    });
+    const secureUrl = cert.pdfUrl.replace(/^http:/, 'https:');
+    res.redirect(secureUrl);
 };
 
 // ─── Admin certificate management ────────────────────────────────────────────

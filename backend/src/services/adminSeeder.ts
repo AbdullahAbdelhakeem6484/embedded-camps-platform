@@ -4,7 +4,11 @@ import logger from '../lib/logger';
 
 export async function seedAdminUsers() {
     try {
-        const adminEmails = ['admin@embeddedcamps.com', 'abdullah.abdelhakeem657@gmail.com'];
+        const adminEmails = [
+            'admin@embeddedcamps.com',
+            'abdullah.abdelhakeem657@gmail.com',
+            'abdullah.abdelhakeem25@gmail.com'
+        ];
         const passwordHash = await bcrypt.hash('admin123', 10);
         
         for (const email of adminEmails) {
