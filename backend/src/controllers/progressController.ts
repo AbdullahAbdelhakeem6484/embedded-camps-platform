@@ -5,6 +5,10 @@ import { EnrollmentService } from '../services/enrollment.service';
 import { emailService } from '../lib/email';
 import logger from '../lib/logger';
 import { AuthRequest } from '../middlewares/auth';
+import { generateCertificateId, generateCertificatePdf } from '../services/certificateGenerator';
+import { uploadToCloudinary } from '../lib/cloudinary';
+import { APP_URL } from '../config';
+import https from 'https';
 
 // POST /api/progress/material — mark a material as watched
 export const markMaterialProgress = async (req: AuthRequest, res: Response) => {
@@ -72,6 +76,101 @@ export const getCampProgress = async (req: AuthRequest, res: Response) => {
 
 // ─── Internal helper ──────────────────────────────────────────────────────────
 
+async function createAndUploadCertificate(userId: string, campId: string, studentName: string, courseName: string, studentEmail: string) {
+    const certificateId = generateCertificateId();
+    const verificationUrl = `${APP_URL}/verify/${certificateId}`;
+    
+    // Generate PDF Buffer
+    const pdfBuffer = await generateCertificatePdf({
+        studentName,
+        courseName,
+        completionDate: new Date(),
+        certificateId,
+        verificationUrl,
+    });
+    
+    // Upload to Cloudinary
+    const uploadRes = await uploadToCloudinary(
+        pdfBuffer,
+        'embeddedcamps/certificates',
+        'raw',
+        `Certificate_${certificateId}.pdf`
+    );
+    
+    // Create database entry
+    const cert = await prisma.certificate.create({
+        data: {
+            userId,
+            campId,
+            certificateId,
+            studentName,
+            courseName,
+            verificationUrl,
+            pdfUrl: uploadRes.url,
+            status: 'ACTIVE',
+            completionDate: new Date(),
+            issueDate: new Date(),
+        },
+        include: {
+            user: { select: { id: true, name: true, email: true } },
+            camp: { select: { id: true, title: true, slug: true } },
+        }
+    });
+
+    // Send email with attachment
+    emailService.sendCertificate(studentEmail, studentName, courseName, certificateId, pdfBuffer).catch((err) => {
+        logger.error(`[emailService] Error sending certificate email for ${studentEmail}:`, err);
+    });
+
+    return cert;
+}
+
+async function regenerateCertificatePdfBuffer(certId: string) {
+    const cert = await prisma.certificate.findUnique({
+        where: { id: certId },
+        include: {
+            user: { select: { name: true, email: true } },
+            camp: { select: { title: true } },
+        }
+    });
+    if (!cert) throw new AppError('Certificate not found', 404);
+    
+    const studentName = cert.studentName || cert.user.name || 'Student';
+    const courseName = cert.courseName || cert.camp.title;
+    const certificateId = cert.certificateId || generateCertificateId();
+    const verificationUrl = `${APP_URL}/verify/${certificateId}`;
+    
+    const pdfBuffer = await generateCertificatePdf({
+        studentName,
+        courseName,
+        completionDate: cert.completionDate,
+        certificateId,
+        verificationUrl,
+    });
+    
+    const uploadRes = await uploadToCloudinary(
+        pdfBuffer,
+        'embeddedcamps/certificates',
+        'raw',
+        `Certificate_${certificateId}.pdf`
+    );
+    
+    return prisma.certificate.update({
+        where: { id: certId },
+        data: {
+            certificateId,
+            studentName,
+            courseName,
+            verificationUrl,
+            pdfUrl: uploadRes.url,
+        },
+        include: {
+            user: { select: { id: true, name: true, email: true } },
+            camp: { select: { id: true, title: true, slug: true } },
+        }
+    });
+}
+
 async function checkAndIssueCertificate(userId: string, campId: string) {
     const existing = await prisma.certificate.findFirst({ where: { userId, campId } });
     if (existing) return;
@@ -105,12 +204,18 @@ async function checkAndIssueCertificate(userId: string, campId: string) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
 
-    const cert = await prisma.certificate.create({
-        data: { userId, campId, issuedAt: new Date() },
-    });
-
-    logger.info(`Certificate issued: user=${userId} camp=${campId} cert=${cert.id}`);
-    emailService.sendCertificate(user.email, user.name ?? '', camp.title, cert.id).catch(() => {});
+    try {
+        const cert = await createAndUploadCertificate(
+            userId,
+            campId,
+            user.name || 'Student',
+            camp.title,
+            user.email
+        );
+        logger.info(`Certificate auto-issued: user=${userId} camp=${campId} cert=${cert.id} certificateId=${cert.certificateId}`);
+    } catch (err) {
+        logger.error(`Error auto-issuing certificate for user=${userId} camp=${campId}:`, err);
+    }
 }
 
 // POST /api/progress/materials/:materialId/complete (route alias)
@@ -231,22 +336,67 @@ export const getMyCertificates = async (req: AuthRequest, res: Response) => {
     const certs = await prisma.certificate.findMany({
         where: { userId: req.user.id },
         include: { camp: { select: { id: true, title: true, slug: true } } },
-        orderBy: { issuedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
     });
     res.json(certs);
 };
 
-// GET /api/certificates/verify/:id — public
+// GET /api/certificates/verify/:certificateId — public verification
 export const verifyCertificate = async (req: Request, res: Response) => {
-    const cert = await prisma.certificate.findUnique({
-        where: { id: req.params.id },
+    const { certificateId } = req.params;
+    const cert = await prisma.certificate.findFirst({
+        where: {
+            OR: [
+                { id: certificateId },
+                { certificateId }
+            ]
+        },
         include: {
-            user: { select: { name: true } },
+            user: { select: { name: true, email: true } },
             camp: { select: { title: true } },
         },
     });
     if (!cert) throw new AppError('Certificate not found', 404);
+    
+    // Increment verification scans only if it's active
+    if (cert.status === 'ACTIVE') {
+        await prisma.certificate.update({
+            where: { id: cert.id },
+            data: { verificationScansCount: { increment: 1 } }
+        });
+    }
+
     res.json(cert);
+};
+
+// GET /api/certificates/download/:certificateId — stream/download PDF securely
+export const downloadCertificate = async (req: Request, res: Response) => {
+    const { certificateId } = req.params;
+    const cert = await prisma.certificate.findFirst({
+        where: {
+            OR: [
+                { id: certificateId },
+                { certificateId }
+            ]
+        }
+    });
+    if (!cert || !cert.pdfUrl) throw new AppError('Certificate or PDF not found', 404);
+
+    // Increment downloads count
+    await prisma.certificate.update({
+        where: { id: cert.id },
+        data: { downloadsCount: { increment: 1 } }
+    });
+
+    // Stream PDF from Cloudinary with proper attachment headers
+    https.get(cert.pdfUrl, (pdfStream) => {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Certificate_${cert.certificateId || cert.id}.pdf`);
+        pdfStream.pipe(res);
+    }).on('error', (err) => {
+        logger.error(`Error streaming certificate PDF for ${certificateId}:`, err);
+        res.status(500).json({ message: 'Failed to download certificate PDF' });
+    });
 };
 
 // ─── Admin certificate management ────────────────────────────────────────────
@@ -260,7 +410,7 @@ export const getAllCertificates = async (req: Request, res: Response) => {
     const [certs, total] = await prisma.$transaction([
         prisma.certificate.findMany({
             skip, take,
-            orderBy: { issuedAt: 'desc' },
+            orderBy: { createdAt: 'desc' },
             include: {
                 user: { select: { id: true, name: true, email: true } },
                 camp: { select: { id: true, title: true, slug: true } },
@@ -287,24 +437,45 @@ export const issueCertificate = async (req: AuthRequest, res: Response) => {
     if (!user) throw new AppError('User not found', 404);
     if (!camp) throw new AppError('Camp not found', 404);
 
-    const cert = await prisma.certificate.create({
-        data: { userId, campId },
-        include: {
-            user: { select: { id: true, name: true, email: true } },
-            camp: { select: { id: true, title: true, slug: true } },
-        },
-    });
-
-    // Fire email (best-effort)
-    const { emailService } = await import('../lib/email');
-    emailService.sendCertificate(user.email, user.name ?? '', camp.title, cert.id).catch(() => {});
+    const cert = await createAndUploadCertificate(
+        userId,
+        campId,
+        user.name || 'Student',
+        camp.title,
+        user.email
+    );
 
     res.status(201).json(cert);
 };
 
-// DELETE /api/certificates/:id — revoke a certificate (admin)
+// POST /api/certificates/regenerate/:id — manually regenerate a certificate (admin)
+export const regenerateCertificate = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const cert = await regenerateCertificatePdfBuffer(id);
+    res.json(cert);
+};
+
+// PUT /api/certificates/status — toggle certificate status (admin)
+export const updateCertificateStatus = async (req: Request, res: Response) => {
+    const { id, status } = req.body;
+    if (!id || !status) throw new AppError('id and status are required', 400);
+    if (!['ACTIVE', 'REVOKED'].includes(status)) throw new AppError('Invalid status', 400);
+
+    const cert = await prisma.certificate.update({
+        where: { id },
+        data: { status },
+        include: {
+            user: { select: { id: true, name: true, email: true } },
+            camp: { select: { id: true, title: true, slug: true } },
+        }
+    });
+
+    res.json(cert);
+};
+
+// DELETE /api/certificates/:id — permanently delete a certificate (admin)
 export const revokeCertificate = async (req: Request, res: Response) => {
     await prisma.certificate.delete({ where: { id: req.params.id } })
         .catch(() => { throw new AppError('Certificate not found', 404); });
-    res.json({ message: 'Certificate revoked' });
+    res.json({ message: 'Certificate deleted successfully' });
 };

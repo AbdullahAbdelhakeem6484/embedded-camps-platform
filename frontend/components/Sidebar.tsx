@@ -88,6 +88,7 @@ export default function Sidebar({ isAdmin, isOpen = false, onClose }: SidebarPro
     const engineerLinks = [
         { name: 'Home', href: '/', icon: Home },
         { name: 'My Camps', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'My Certificates', href: '/dashboard/certificates', icon: Award },
         { name: 'Bookmarks', href: '/dashboard/bookmarks', icon: Bookmark },
         { name: 'Quiz History', href: '/dashboard/quizzes', icon: ClipboardList },
         { name: 'Profile', href: '/dashboard/profile', icon: User },

@@ -72,8 +72,13 @@ export const EmailService = {
         });
     },
 
-    async sendCertificate(toEmail: string, name: string, campTitle: string, certificateId: string) {
+    async sendCertificate(toEmail: string, name: string, campTitle: string, certificateId: string, pdfBuffer?: Buffer) {
         const verifyUrl = `${APP_URL}/verify/${certificateId}`;
+        const attachments = pdfBuffer ? [{
+            filename: `Certificate_${certificateId}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+        }] : [];
         return this._send({
             to: toEmail,
             subject: `Your EmbeddedCamps Certificate — ${campTitle} 🏆`,
@@ -85,20 +90,22 @@ export const EmailService = {
                     <a href="${verifyUrl}" style="display:inline-block;margin:24px 0;padding:14px 28px;background:#d97706;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">
                         View Certificate
                     </a>
-                    <p style="color:#9ca3af;font-size:13px;">Certificate ID: <code>${certificateId}</code></p>
+                    <p style="margin-top: 15px; color: #d1d5db;">We have also attached your official PDF certificate to this email.</p>
+                    <p style="color:#9ca3af;font-size:13px;margin-top: 20px;">Certificate ID: <code>${certificateId}</code></p>
                 </div>
             `,
+            attachments,
         });
     },
 
-    async _send({ to, subject, html }: { to: string; subject: string; html: string }) {
+    async _send({ to, subject, html, attachments }: { to: string; subject: string; html: string; attachments?: any[] }) {
         // If SMTP is not configured, log instead of throwing
         if (!SMTP_HOST || !SMTP_USER) {
             logger.warn(`[Email] SMTP not configured. Would have sent "${subject}" to ${to}`);
             return;
         }
         try {
-            const info = await transporter.sendMail({ from: EMAIL_FROM, to, subject, html });
+            const info = await transporter.sendMail({ from: EMAIL_FROM, to, subject, html, attachments });
             logger.info(`[Email] Sent "${subject}" to ${to} (messageId: ${info.messageId})`);
         } catch (err) {
             logger.error(`[Email] Failed to send "${subject}" to ${to}:`, err);
