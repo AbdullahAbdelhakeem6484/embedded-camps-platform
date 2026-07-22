@@ -380,9 +380,13 @@ export const downloadCertificate = async (req: Request, res: Response) => {
                 { id: certificateId },
                 { certificateId }
             ]
+        },
+        include: {
+            user: { select: { name: true } },
+            camp: { select: { title: true } }
         }
     });
-    if (!cert || !cert.pdfUrl) throw new AppError('Certificate or PDF not found', 404);
+    if (!cert) throw new AppError('Certificate not found', 404);
 
     // Increment downloads count
     await prisma.certificate.update({
@@ -390,8 +394,21 @@ export const downloadCertificate = async (req: Request, res: Response) => {
         data: { downloadsCount: { increment: 1 } }
     });
 
-    const secureUrl = cert.pdfUrl.replace(/^http:/, 'https:');
-    res.redirect(secureUrl);
+    const studentName = cert.user?.name || 'Engineer';
+    const courseName = cert.camp?.title || 'Bootcamp Specification';
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://embedded-camps-platform.vercel.app'}/verify/${cert.certificateId || cert.id}`;
+
+    const pdfBuffer = await generateCertificatePdf({
+        studentName,
+        courseName,
+        completionDate: cert.issueDate,
+        certificateId: cert.certificateId || cert.id,
+        verificationUrl,
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename=Certificate_${cert.certificateId || cert.id}.pdf`);
+    res.send(pdfBuffer);
 };
 
 // ─── Admin certificate management ────────────────────────────────────────────
