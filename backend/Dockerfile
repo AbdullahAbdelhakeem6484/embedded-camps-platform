@@ -37,4 +37,4 @@ ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 
 EXPOSE 4000
 
-CMD ["node", "dist/server.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/server.js"]
