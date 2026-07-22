@@ -73,7 +73,15 @@ export const getCampById = async (req: AuthRequest, res: Response) => {
                 where: req.user.role === 'ADMIN' ? {} : { isVisible: true },
                 include: {
                     masterSession: {
-                        include: { materials: { orderBy: { order: 'asc' } }, labs: true },
+                        include: { 
+                            materials: { orderBy: { order: 'asc' } }, 
+                            labs: true,
+                            quizzes: {
+                                include: {
+                                    questions: { orderBy: { order: 'asc' } }
+                                }
+                            }
+                        },
                     },
                 },
                 orderBy: { order: 'asc' },

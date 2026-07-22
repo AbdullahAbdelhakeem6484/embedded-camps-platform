@@ -40,9 +40,7 @@ export async function uploadToCloudinary(
         const baseName = originalName
             ? originalName.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '')
             : `file_${timestamp}`;
-        // Raw files (PDF, etc.) and explicit PDF images MUST keep their extension in the public_id so
-        // Cloudinary serves them with the correct Content-Type header.
-        const publicId = (resourceType === 'raw' || ext === '.pdf')
+        const publicId = resourceType === 'raw'
             ? `${folder}/${timestamp}_${baseName}${ext}`
             : `${folder}/${timestamp}_${baseName}`;
 
