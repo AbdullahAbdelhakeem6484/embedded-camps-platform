@@ -93,7 +93,7 @@ async function createAndUploadCertificate(userId: string, campId: string, studen
     const uploadRes = await uploadToCloudinary(
         pdfBuffer,
         'embeddedcamps/certificates',
-        'raw',
+        'image',
         `Certificate_${certificateId}.pdf`
     );
     
@@ -151,7 +151,7 @@ async function regenerateCertificatePdfBuffer(certId: string) {
     const uploadRes = await uploadToCloudinary(
         pdfBuffer,
         'embeddedcamps/certificates',
-        'raw',
+        'image',
         `Certificate_${certificateId}.pdf`
     );
     
