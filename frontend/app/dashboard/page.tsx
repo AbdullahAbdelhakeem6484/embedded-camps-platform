@@ -106,14 +106,14 @@ export default function EngineerDashboard() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    const totalCompleted = summary.reduce((s, c) => s + c.progress.completed, 0);
-    const totalMaterials = summary.reduce((s, c) => s + c.progress.total, 0);
+    const totalCompleted = summary.reduce((s, c) => s + (c.progress?.completed ?? 0), 0);
+    const totalMaterials = summary.reduce((s, c) => s + (c.progress?.total ?? 0), 0);
     const overallPct = totalMaterials > 0 ? Math.round((totalCompleted / totalMaterials) * 100) : 0;
     const allUpcomingLabs = summary.flatMap(c => c.upcomingLabs.map(l => ({ ...l, campTitle: c.campTitle, campId: c.campId })))
         .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
     // Best "continue learning" — camp with lowest progress that has a next material
-    const continueCamp = summary.find(c => c.nextMaterial && c.progress.percentage < 100) ?? null;
+    const continueCamp = summary.find(c => c.nextMaterial && (c.progress?.percentage ?? 0) < 100) ?? null;
 
     if (loading) {
         return (

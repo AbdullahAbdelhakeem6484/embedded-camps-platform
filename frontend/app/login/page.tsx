@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { setToken, setStoredUser, getStoredUser } from '@/lib/auth';
+import { setToken, setStoredUser, getStoredUser, clearToken } from '@/lib/auth';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
@@ -30,6 +30,7 @@ export default function LoginPage() {
             const role = res.data.user?.role;
             router.push(role === 'ADMIN' ? '/admin' : '/dashboard');
         } catch (err: any) {
+            clearToken();
             setError(err.response?.data?.message || 'Invalid email or password');
         } finally {
             setLoading(false);

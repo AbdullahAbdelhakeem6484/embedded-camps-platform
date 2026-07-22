@@ -33,6 +33,7 @@ export function setToken(token: string): void {
 
 export function clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_CACHE_KEY);
 }
 
 export function logout(): void {
