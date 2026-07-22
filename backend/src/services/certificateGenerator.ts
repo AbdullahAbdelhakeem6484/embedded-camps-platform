@@ -70,8 +70,8 @@ export async function generateCertificatePdf(params: GenerateCertificateParams):
             let hasCustomFonts = false;
             try {
                 const [regular, bold, cursive] = await Promise.all([
-                    getFont('https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat-Regular.ttf', 'Montserrat-Regular'),
-                    getFont('https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat-Bold.ttf', 'Montserrat-Bold'),
+                    getFont('https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Regular.ttf', 'Montserrat-Regular'),
+                    getFont('https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf', 'Montserrat-Bold'),
                     getFont('https://raw.githubusercontent.com/google/fonts/main/ofl/greatvibes/GreatVibes-Regular.ttf', 'GreatVibes-Regular'),
                 ]);
                 doc.registerFont('Montserrat', regular);
