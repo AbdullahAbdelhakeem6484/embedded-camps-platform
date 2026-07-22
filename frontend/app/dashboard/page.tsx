@@ -179,6 +179,58 @@ export default function EngineerDashboard() {
                 </div>
             )}
 
+            {/* ─── My Enrolled Camps ─── */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-violet-400" /> My Enrolled Camps
+                </h2>
+                {summary.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500 bg-[#111113] rounded-2xl border border-white/5">
+                        <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                        <p>You are not enrolled in any camps yet.</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {summary.map(camp => {
+                            const days = daysLeft(camp.expiresAt);
+                            return (
+                                <Link key={camp.campId} href={`/dashboard/camps/${camp.campId}`}
+                                    className="bg-[#111113] border border-white/5 rounded-2xl p-5 hover:border-violet-500/30 transition-all group flex flex-col justify-between space-y-4">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            {camp.level && (
+                                                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${LEVEL_COLORS[camp.level] || 'text-gray-400 bg-white/5'}`}>
+                                                    {camp.level}
+                                                </span>
+                                            )}
+                                            {days !== null && (
+                                                <span className={`text-[10px] font-semibold ${days <= 7 ? 'text-red-400' : 'text-gray-500'}`}>
+                                                    {days <= 0 ? 'Expired' : `${days} days left`}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h3 className="font-bold text-lg group-hover:text-violet-400 transition-colors line-clamp-1">{camp.campTitle}</h3>
+                                        <p className="text-xs text-gray-500">Enrolled: {new Date(camp.enrolledAt).toLocaleDateString()}</p>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                                        <div className="flex items-center gap-3">
+                                            <ProgressRing pct={camp.progress?.percentage ?? 0} size={42} />
+                                            <div className="text-xs">
+                                                <p className="font-bold text-gray-300">{camp.progress?.completed ?? 0} / {camp.progress?.total ?? 0}</p>
+                                                <p className="text-gray-500">Materials done</p>
+                                            </div>
+                                        </div>
+                                        <span className="p-2 bg-white/5 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition-all text-gray-400">
+                                            <ChevronRight className="w-4 h-4" />
+                                        </span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
             {/* ─── Announcements ─── */}
             {announcements.length > 0 && (
                 <div className="space-y-3">
